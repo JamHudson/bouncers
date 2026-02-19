@@ -20,35 +20,40 @@ static constexpr bn::fixed BASE_SPEED = 2;
 // Maximum number of bouncers on screen at once
 static constexpr int MAX_BOUNCERS = 20;
 
-bn::fixed getSpriteAverageX(bn::vector<bn::sprite_ptr, MAX_BOUNCERS> sprites)
+class Bouncer
+{
+public:
+    bn::sprite_ptr sprite = bn::sprite_items::dot.create_sprite();
+    bn::fixed speed = BASE_SPEED;
+};
+
+bn::fixed getAverageX(bn::vector<Bouncer, MAX_BOUNCERS> &bouncers)
 {
     // Add all x positions together
     bn::fixed x_sum = 0;
-    for (bn::sprite_ptr sprite : sprites)
+    for (Bouncer bouncer : bouncers)
     {
-        x_sum += sprite.x();
+        x_sum += bouncer.sprite.x();
     }
 
     bn::fixed x_average = x_sum;
 
     // Only divide if we have 1 or more
     // Prevents division by 0
-    if (sprites.size() > 0)
+    if (bouncers.size() > 0)
     {
-        x_average /= sprites.size();
+        x_average /= bouncers.size();
     }
 
     return x_average;
 }
 
-void addBouncer(bn::vector<bn::sprite_ptr, MAX_BOUNCERS> &sprites,
-                bn::vector<bn::fixed, MAX_BOUNCERS> &x_speeds)
+void addBouncer(bn::vector<Bouncer, MAX_BOUNCERS> &bouncers)
 {
     // Only add if we're below the maximum
-    if (sprites.size() < sprites.max_size())
+    if (bouncers.size() < bouncers.max_size())
     {
-        sprites.push_back(bn::sprite_items::dot.create_sprite());
-        x_speeds.push_back(BASE_SPEED);
+        bouncers.push_back(Bouncer());
     }
 }
 
@@ -56,51 +61,49 @@ int main()
 {
     bn::core::init();
 
-    // Sprites and x speeds of bouncers
-    // Items with the same index correspond to each other
-    bn::vector<bn::sprite_ptr, MAX_BOUNCERS> sprites = {};
-    bn::vector<bn::fixed, MAX_BOUNCERS> x_speeds = {};
+    // Bouncers
+    bn::vector<Bouncer, MAX_BOUNCERS> bouncers = {};
 
     while (true)
     {
         // if A is pressed add a new bouncer
         if (bn::keypad::a_pressed())
         {
-            addBouncer(sprites, x_speeds);
+            addBouncer(bouncers);
         }
 
         // if B is pressed print the average to the console
         if (bn::keypad::b_pressed())
         {
-            BN_LOG("Average x: ", getSpriteAverageX(sprites));
+            // BN_LOG("Average x: ", getAverageX(sprites));
         }
 
         // for each bouncer
-        for (int i = 0; i < sprites.size(); i++)
+        for (int i = 0; i < bouncers.size(); i++)
         {
-            bn::sprite_ptr sprite = sprites[i];
+            Bouncer &bouncer = bouncers[i];
 
-            bn::fixed x = sprite.x();
+            bn::fixed x = bouncer.sprite.x();
 
             // Update x position by adding speed
-            x += x_speeds[i];
+            x += bouncer.speed;
 
             // If we've gone off the screen on the right
             if (x > MAX_X)
             {
                 // Snap back to screen and reverse direction
                 x = MAX_X;
-                x_speeds[i] *= -1;
+                bouncer.speed *= -1;
             }
             // If we've gone off the screen on the left
             if (x < MIN_X)
             {
                 // Snap back to screen and reverse direction
                 x = MIN_X;
-                x_speeds[i] *= -1;
+                bouncer.speed *= -1;
             }
 
-            sprite.set_x(x);
+            bouncer.sprite.set_x(x);
         }
 
         bn::core::update();
