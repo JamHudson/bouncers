@@ -41,6 +41,17 @@ bn::fixed getSpriteAverageX(bn::vector<bn::sprite_ptr, MAX_BOUNCERS> sprites)
     return x_average;
 }
 
+void addBouncer(bn::vector<bn::sprite_ptr, MAX_BOUNCERS> &sprites,
+                bn::vector<bn::fixed, MAX_BOUNCERS> &x_speeds)
+{
+    // Only add if we're below the maximum
+    if (sprites.size() < sprites.max_size())
+    {
+        sprites.push_back(bn::sprite_items::dot.create_sprite());
+        x_speeds.push_back(BASE_SPEED);
+    }
+}
+
 int main()
 {
     bn::core::init();
@@ -55,12 +66,7 @@ int main()
         // if A is pressed add a new bouncer
         if (bn::keypad::a_pressed())
         {
-            // Only add if we're below the maximum
-            if (sprites.size() < sprites.max_size())
-            {
-                sprites.push_back(bn::sprite_items::dot.create_sprite());
-                x_speeds.push_back(BASE_SPEED);
-            }
+            addBouncer(sprites, x_speeds);
         }
 
         // if B is pressed print the average to the console
