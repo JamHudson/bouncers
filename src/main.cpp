@@ -75,7 +75,7 @@ int main()
         // if B is pressed print the average to the console
         if (bn::keypad::b_pressed())
         {
-            // BN_LOG("Average x: ", getAverageX(sprites));
+            BN_LOG("Average x: ", getAverageX(bouncers));
         }
 
         // for each bouncer
