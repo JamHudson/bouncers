@@ -6,6 +6,7 @@
 #include <bn_random.h>
 #include <bn_vector.h>
 #include <bn_log.h>
+#include <bn_random.h>
 
 #include "bn_sprite_items_dot.h"
 
@@ -19,18 +20,24 @@ static constexpr int HALF_SCREEN_HEIGHT = bn::display::height() / 2;
 static constexpr bn::fixed MIN_Y = -HALF_SCREEN_HEIGHT;
 static constexpr bn::fixed MAX_Y = HALF_SCREEN_HEIGHT;
 
+// Random
+static bn::random rng = bn::random();
+
 // Starting speed of a bouncer
 static constexpr bn::fixed BASE_SPEED = 2;
 
 // Maximum number of bouncers on screen at once
 static constexpr int MAX_BOUNCERS = 20;
 
+static constexpr bn::fixed MAX_SPEED = 10.0;
+static constexpr bn::fixed MIN_SPEED = -10.0;
+
 class Bouncer
 {
 public:
     bn::sprite_ptr sprite = bn::sprite_items::dot.create_sprite();
-    bn::fixed x_speed = BASE_SPEED;
-    bn::fixed y_speed = BASE_SPEED;
+    bn::fixed x_speed = rng.get_fixed(MIN_SPEED, MAX_SPEED);
+    bn::fixed y_speed = rng.get_fixed(MIN_SPEED, MAX_SPEED);
 
     void update()
     {
