@@ -7,6 +7,7 @@
 #include <bn_vector.h>
 #include <bn_log.h>
 #include <bn_random.h>
+#include <bn_math.h>
 
 #include "bn_sprite_items_dot.h"
 
@@ -26,24 +27,64 @@ static bn::random rng = bn::random();
 // Starting speed of a bouncer
 static constexpr bn::fixed BASE_SPEED = 2;
 
+// Physics decrease
+static constexpr bn::fixed BASE_GRAVITY = 2;
+static constexpr bn::fixed BASE_FRICTION = 2;
+
+// Whether or not physics is active
+static bool physics = false;
+
 // Maximum number of bouncers on screen at once
 static constexpr int MAX_BOUNCERS = 20;
 
 static constexpr bn::fixed MAX_SPEED = 10.0;
 static constexpr bn::fixed MIN_SPEED = -10.0;
 
+bn::fixed getSign(bn::fixed x)
+{
+    return (x > 0 ? 1 : -1);
+}
+
 class Bouncer
 {
 public:
     bn::sprite_ptr sprite = bn::sprite_items::dot.create_sprite();
-    bn::fixed x_speed = rng.get_fixed(MIN_SPEED, MAX_SPEED);
-    bn::fixed y_speed = rng.get_fixed(MIN_SPEED, MAX_SPEED);
+    bn::fixed x_speed = 0;
+    bn::fixed y_speed = 0;
+    bn::fixed top_x_speed = rng.get_fixed(MIN_SPEED, MAX_SPEED);
+    bn::fixed top_y_speed = rng.get_fixed(MIN_SPEED, MAX_SPEED);
+
+    // Sets bouncer to its default speed.
+    void setNormalSpeed()
+    {
+
+        x_speed = top_x_speed;
+        y_speed = top_y_speed;
+    }
 
     void update()
     {
         bn::fixed x = sprite.x();
         bn::fixed y = sprite.y();
 
+        if (physics)
+        {
+            // Decrease x speed to 0, decrease y speed to max.
+            // Only reduced speed if there is any, prevents division by 0
+            if (x_speed == 0)
+            {
+                x_speed = 0;
+            }
+            else
+            {
+                // MAX_Y is the bottom(?)
+                if (y == MAX_Y)
+                {
+                    x_speed -= BASE_FRICTION * getSign(x_speed);
+                }
+            }
+            y_speed += BASE_GRAVITY;
+        }
         // Update x position by adding speed
         x += x_speed;
         y += y_speed;
@@ -77,7 +118,6 @@ public:
             y = MIN_Y;
             y_speed *= -1;
         }
-
         sprite.set_x(x);
         sprite.set_y(y);
     }
@@ -109,7 +149,9 @@ void addBouncer(bn::vector<Bouncer, MAX_BOUNCERS> &bouncers)
     // Only add if we're below the maximum
     if (bouncers.size() < bouncers.max_size())
     {
-        bouncers.push_back(Bouncer());
+        Bouncer b = Bouncer();
+        b.setNormalSpeed();
+        bouncers.push_back(b);
     }
 }
 
@@ -132,6 +174,16 @@ int main()
         if (bn::keypad::b_pressed())
         {
             BN_LOG("Average x: ", getAverageX(bouncers));
+        }
+
+        // if R is pressed, drop all of the bouncers.
+        if (bn::keypad::r_pressed())
+        {
+            physics = !physics;
+            for (Bouncer &bouncer : bouncers)
+            {
+                bouncer.setNormalSpeed();
+            }
         }
 
         // for each bouncer
