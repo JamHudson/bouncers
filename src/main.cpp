@@ -41,11 +41,6 @@ static constexpr int MAX_BOUNCERS = 20;
 static constexpr bn::fixed MAX_SPEED = 10.0;
 static constexpr bn::fixed MIN_SPEED = -10.0;
 
-bn::fixed getSign(bn::fixed x)
-{
-    return (x > 0 ? 1 : -1);
-}
-
 class Bouncer
 {
 public:
@@ -83,7 +78,6 @@ public:
                 {
                     x_speed -= x_speed * BASE_FRICTION;
                     if (bn::abs(x_speed) < 1)
-
                     {
                         x_speed = 0;
                     }
