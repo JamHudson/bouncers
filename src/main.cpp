@@ -29,7 +29,8 @@ static constexpr bn::fixed BASE_SPEED = 2;
 
 // Physics decrease
 static constexpr bn::fixed BASE_GRAVITY = 2;
-static constexpr bn::fixed BASE_FRICTION = 2;
+static constexpr bn::fixed BASE_FRICTION = 1;
+static constexpr bn::fixed BASE_ELASTICITY = 0.25; // 0 <= x < 1 for realistic behavior.
 
 // Whether or not physics is active
 static bool physics = false;
@@ -117,6 +118,11 @@ public:
             // Snap back to screen and reverse direction
             y = MAX_Y;
             y_speed *= -1;
+            // If physics are enabled, use an elastic collision (but only for floor).
+            if (physics && y_speed > 0)
+            {
+                y_speed *= BASE_ELASTICITY;
+            }
         }
         // If we've gone off the screen on the top
         if (y < MIN_Y)
