@@ -29,7 +29,7 @@ static constexpr bn::fixed BASE_SPEED = 2;
 
 // Physics decrease
 static constexpr bn::fixed BASE_GRAVITY = 3;
-static constexpr bn::fixed BASE_FRICTION = 1;      // 0 <= x < 1 for realistic behavior.
+static constexpr bn::fixed BASE_FRICTION = 0.25;   // 0 <= x < 1 for realistic behavior.
 static constexpr bn::fixed BASE_ELASTICITY = 0.65; // 0 <= x < 1 for realistic behavior.
 
 // Whether or not physics is active
@@ -81,13 +81,11 @@ public:
                 // MAX_Y is the bottom
                 if (y == MAX_Y)
                 {
-                    if (bn::abs(x_speed) < BASE_FRICTION)
+                    x_speed -= x_speed * BASE_FRICTION;
+                    if (bn::abs(x_speed) < 1)
+
                     {
                         x_speed = 0;
-                    }
-                    else
-                    {
-                        x_speed -= BASE_FRICTION * getSign(x_speed);
                     }
                 }
             }
@@ -193,9 +191,12 @@ int main()
         if (bn::keypad::r_pressed())
         {
             physics = !physics;
-            for (Bouncer &bouncer : bouncers)
+            if (!physics)
             {
-                bouncer.setNormalSpeed();
+                for (Bouncer &bouncer : bouncers)
+                {
+                    bouncer.setNormalSpeed();
+                }
             }
         }
 
