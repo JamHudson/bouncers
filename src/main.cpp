@@ -77,10 +77,17 @@ public:
             }
             else
             {
-                // MAX_Y is the bottom(?)
+                // MAX_Y is the bottom
                 if (y == MAX_Y)
                 {
-                    x_speed -= BASE_FRICTION * getSign(x_speed);
+                    if (bn::abs(x_speed) < BASE_FRICTION)
+                    {
+                        x_speed = 0;
+                    }
+                    else
+                    {
+                        x_speed -= BASE_FRICTION * getSign(x_speed);
+                    }
                 }
             }
             y_speed += BASE_GRAVITY;
@@ -104,14 +111,14 @@ public:
             x_speed *= -1;
         }
 
-        // If we've gone off the screen on the top
+        // If we've gone off the screen on the bottom
         if (y > MAX_Y)
         {
             // Snap back to screen and reverse direction
             y = MAX_Y;
             y_speed *= -1;
         }
-        // If we've gone off the screen on the bottom
+        // If we've gone off the screen on the top
         if (y < MIN_Y)
         {
             // Snap back to screen and reverse direction
