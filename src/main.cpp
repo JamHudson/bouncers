@@ -28,9 +28,9 @@ static bn::random rng = bn::random();
 static constexpr bn::fixed BASE_SPEED = 2;
 
 // Physics decrease
-static constexpr bn::fixed BASE_GRAVITY = 2;
-static constexpr bn::fixed BASE_FRICTION = 1;
-static constexpr bn::fixed BASE_ELASTICITY = 0.25; // 0 <= x < 1 for realistic behavior.
+static constexpr bn::fixed BASE_GRAVITY = 3;
+static constexpr bn::fixed BASE_FRICTION = 1;      // 0 <= x < 1 for realistic behavior.
+static constexpr bn::fixed BASE_ELASTICITY = 0.65; // 0 <= x < 1 for realistic behavior.
 
 // Whether or not physics is active
 static bool physics = false;
@@ -119,7 +119,7 @@ public:
             y = MAX_Y;
             y_speed *= -1;
             // If physics are enabled, use an elastic collision (but only for floor).
-            if (physics && y_speed > 0)
+            if (physics && y_speed != 0)
             {
                 y_speed *= BASE_ELASTICITY;
             }
