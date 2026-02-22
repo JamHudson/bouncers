@@ -41,6 +41,9 @@ static constexpr int MAX_BOUNCERS = 20;
 static constexpr bn::fixed MAX_SPEED = 10.0;
 static constexpr bn::fixed MIN_SPEED = -10.0;
 
+static constexpr bn::color defaultBackground = bn::color(31, 0, 15);
+static constexpr bn::color physicsBackground = bn::color(0, 18, 31);
+
 class Bouncer
 {
 public:
@@ -163,6 +166,7 @@ void addBouncer(bn::vector<Bouncer, MAX_BOUNCERS> &bouncers)
 int main()
 {
     bn::core::init();
+    bn::backdrop::set_color(defaultBackground);
 
     // Bouncers
     bn::vector<Bouncer, MAX_BOUNCERS> bouncers = {};
@@ -187,10 +191,15 @@ int main()
             physics = !physics;
             if (!physics)
             {
+                bn::backdrop::set_color(defaultBackground);
                 for (Bouncer &bouncer : bouncers)
                 {
                     bouncer.setNormalSpeed();
                 }
+            }
+            else
+            {
+                bn::backdrop::set_color(physicsBackground);
             }
         }
 
